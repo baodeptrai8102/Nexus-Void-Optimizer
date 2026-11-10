@@ -84,6 +84,16 @@ function Invoke-M28 { Log-Step "28" "Tắt thông báo tụt FPS..."; Set-ItemPr
 function Invoke-M29 { Log-Step "29" "Quét SFC Scannow..."; Write-Host "  └── Đang quét, vui lòng đợi..." -ForegroundColor Cyan; sfc /scannow; Log-Ok "Hoàn tất kiểm tra hệ thống." }
 function Invoke-M30 { Log-Step "30" "Hoàn tác về mặc định..."; Set-ItemProperty "HKCU:\Control Panel\Mouse" "MouseSpeed" "1"; Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl" "Win32PrioritySeparation" 2; powercfg -h on; Log-Ok "Đã khôi phục cài đặt gốc." }
 
+# --- CHỨC NĂNG TỐI ƯU 1 CHẠM ---
+function Invoke-OneClick {
+    Write-Host "`n  🚀 ĐANG KÍCH HOẠT QUY TRÌNH TỐI ƯU 1 CHẠM (ONE-CLICK EXTREME) ⚡..." -ForegroundColor Green
+    Invoke-M01; Invoke-M02; Invoke-M03; Invoke-M04; Invoke-M05; Invoke-M06; Invoke-M07; Invoke-M08; Invoke-M09; Invoke-M10
+    Invoke-M11; Invoke-M12; Invoke-M13; Invoke-M14; Invoke-M15; Invoke-M16; Invoke-M17; Invoke-M18; Invoke-M19; Invoke-M20
+    Invoke-M21; Invoke-M22; Invoke-M23; Invoke-M24; Invoke-M25; Invoke-M26; Invoke-M27; Invoke-M28
+    Write-Host "`n  🎉 ĐÃ HOÀN TẤT TOÀN BỘ QUY TRÌNH TỐI ƯU HÓA 1 CHẠM AN TOÀN!" -ForegroundColor Green
+    Wait-Key
+}
+
 # ============================================================================
 # VÒNG LẶP MENU GIAO DIỆN
 # ============================================================================
@@ -119,29 +129,20 @@ do {
     Write-Host "   15. Tắt Quay Ngầm Xbox DVR & Sticky Keys      30. Khôi Phục Toàn Bộ Thiết Lập Mặc Định"
 
     Write-Host "`n  ==========================================================================================" -ForegroundColor DarkMagenta
-    Write-Host "   [A] ⚡ AUTO OPTIMIZE (Chạy từ 01 đến 28)       [0] ❌ Thoát" -ForegroundColor Yellow
+    Write-Host "   [31] 🚀 TỐI ƯU 1 CHẠM (ONE-CLICK EXTREME)     [0] ❌ Thoát Chương Trình" -ForegroundColor Green
     
-    $sel = Read-Host "`n  👉 Chọn Lệnh (1-30, A, 0)"
+    $sel = Read-Host "`n  👉 Chọn Lệnh (1-31, 0)"
     
     switch ($sel.Trim().ToUpper()) {
-        "1"  { Invoke-M01; Wait-Key }
-        "01" { Invoke-M01; Wait-Key }
-        "2"  { Invoke-M02; Wait-Key }
-        "02" { Invoke-M02; Wait-Key }
-        "3"  { Invoke-M03; Wait-Key }
-        "03" { Invoke-M03; Wait-Key }
-        "4"  { Invoke-M04; Wait-Key }
-        "04" { Invoke-M04; Wait-Key }
-        "5"  { Invoke-M05; Wait-Key }
-        "05" { Invoke-M05; Wait-Key }
-        "6"  { Invoke-M06; Wait-Key }
-        "06" { Invoke-M06; Wait-Key }
-        "7"  { Invoke-M07; Wait-Key }
-        "07" { Invoke-M07; Wait-Key }
-        "8"  { Invoke-M08; Wait-Key }
-        "08" { Invoke-M08; Wait-Key }
-        "9"  { Invoke-M09; Wait-Key }
-        "09" { Invoke-M09; Wait-Key }
+        "1"  { Invoke-M01; Wait-Key } "01" { Invoke-M01; Wait-Key }
+        "2"  { Invoke-M02; Wait-Key } "02" { Invoke-M02; Wait-Key }
+        "3"  { Invoke-M03; Wait-Key } "03" { Invoke-M03; Wait-Key }
+        "4"  { Invoke-M04; Wait-Key } "04" { Invoke-M04; Wait-Key }
+        "5"  { Invoke-M05; Wait-Key } "05" { Invoke-M05; Wait-Key }
+        "6"  { Invoke-M06; Wait-Key } "06" { Invoke-M06; Wait-Key }
+        "7"  { Invoke-M07; Wait-Key } "07" { Invoke-M07; Wait-Key }
+        "8"  { Invoke-M08; Wait-Key } "08" { Invoke-M08; Wait-Key }
+        "9"  { Invoke-M09; Wait-Key } "09" { Invoke-M09; Wait-Key }
         "10" { Invoke-M10; Wait-Key }
         "11" { Invoke-M11; Wait-Key }
         "12" { Invoke-M12; Wait-Key }
@@ -163,15 +164,9 @@ do {
         "28" { Invoke-M28; Wait-Key }
         "29" { Invoke-M29; Wait-Key }
         "30" { Invoke-M30; Wait-Key }
-        "A"  {
-            Write-Host "`n  🌌 ĐANG CHẠY TỰ ĐỘNG TOÀN BỘ 28 TÁC VỤ NEXUS VOID ⚡..." -ForegroundColor Cyan
-            Invoke-M01; Invoke-M02; Invoke-M03; Invoke-M04; Invoke-M05; Invoke-M06; Invoke-M07; Invoke-M08; Invoke-M09; Invoke-M10
-            Invoke-M11; Invoke-M12; Invoke-M13; Invoke-M14; Invoke-M15; Invoke-M16; Invoke-M17; Invoke-M18; Invoke-M19; Invoke-M20
-            Invoke-M21; Invoke-M22; Invoke-M23; Invoke-M24; Invoke-M25; Invoke-M26; Invoke-M27; Invoke-M28
-            Write-Host "`n  🎉 ĐÃ HOÀN TẤT TOÀN BỘ QUY TRÌNH TỐI ƯU HÓA HỆ THỐNG AN TOÀN!" -ForegroundColor Green
-            Wait-Key
-        }
+        "31" { Invoke-OneClick }
+        "A"  { Invoke-OneClick }
         "0"  { exit }
-        default { Write-Host "  ⚠️ Lỗi mã! Hãy nhập từ 1-30, A hoặc 0." -ForegroundColor Red; Start-Sleep -Seconds 1 }
+        default { Write-Host "  ⚠️ Lỗi mã! Hãy nhập từ 1-31 hoặc 0." -ForegroundColor Red; Start-Sleep -Seconds 1 }
     }
 } while ($true)
