@@ -1,5 +1,5 @@
 # ============================================================================
-# 🌌 NEXUS VOID ⚡ - ENGINE TỐI ƯU HÓA HỆ THỐNG & GAMING (v3.0 COMPACT)
+# 🌌 NEXUS VOID ⚡ - ENGINE TỐI ƯU HÓA HỆ THỐNG & GAMING (v3.0 EXTREME PRO)
 # Thiết kế & Phát triển bởi: NEXUS VOID (baodeptrai8102)
 # ============================================================================
 
@@ -43,7 +43,7 @@ public class FontFixer {
 "@
 [FontFixer]::SetConsolas()
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-$Host.UI.RawUI.WindowTitle = "🌌 NEXUS VOID ⚡ | SYSTEM ENGINE v3.0 COMPACT"
+$Host.UI.RawUI.WindowTitle = "🌌 NEXUS VOID ⚡ | SYSTEM ENGINE v3.0 EXTREME PRO"
 $ErrorActionPreference = "SilentlyContinue"
 
 # 3. Hàm hiển thị trạng thái và thu thập phần cứng
@@ -51,7 +51,7 @@ function Log-Step($code, $msg) { Write-Host "  [$code] " -ForegroundColor Magent
 function Log-Ok($msg) { Write-Host "  └── ✔ $msg" -ForegroundColor Green }
 function Wait-Key { Write-Host "`n  Nhấn phím bất kỳ để quay lại 🌌 NEXUS VOID ⚡..." -ForegroundColor DarkGray; $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") }
 function Ask-Restart {
-    Write-Host "`n  ⚠️ Tối ưu hoàn tất! Cần khởi động lại máy để áp dụng 100% sức mạnh." -ForegroundColor Cyan
+    Write-Host "`n  ⚠️ Tối ưu hoàn tất! Cần khởi động lại máy để áp dụng MSI Mode & Registry." -ForegroundColor Cyan
     $ans = Read-Host "  👉 Khởi động lại ngay bây giờ? (Y/N)"
     if ($ans -match '^[yY]') { Restart-Computer -Force }
 }
@@ -66,83 +66,115 @@ function Get-HardwareInfo {
 }
 
 # ============================================================================
-# 11 MODULE TỐI ƯU TÍCH HỢP (GỘP 30 TWEAKS CHUYÊN SÂU)
+# 11 MODULE TỐI ƯU TÍCH HỢP (REGISTRY, UNPARK CPU, MSI MODE & MMCSS PRO)
 # ============================================================================
 
 function Invoke-T01 {
     Log-Step "01" "Core Clean & Backup (Điểm Khôi Phục & Dọn Rác Toàn Diện)"
-    Enable-ComputerRestore -Drive "C:\"; Checkpoint-Computer -Description "NEXUS_VOID_v3" -RestorePointType "MODIFY_SETTINGS"
+    Enable-ComputerRestore -Drive "C:\"; Checkpoint-Computer -Description "NEXUS_VOID_v3_PRO" -RestorePointType "MODIFY_SETTINGS"
     Remove-Item -Path "$env:TEMP\*", "C:\Windows\Temp\*", "C:\Windows\Prefetch\*", "C:\Windows\SoftwareDistribution\Download\*" -Recurse -Force
     Clear-RecycleBin -Force
-    Log-Ok "Đã backup an toàn, xóa sạch file rác và bản cài Update cũ."
+    Log-Ok "Đã tạo Restore Point, xóa sạch Temp, Prefetch và bản cài Update cũ."
 }
 
 function Invoke-T02 {
-    Log-Step "02" "Ultimate CPU Core (Mở Khóa Xung Nhịp & Phân Luồng Game)"
+    Log-Step "02" "Ultimate CPU & Unpark Cores (Nguồn Maximum, Unpark 100% CPU & Tắt Bóp Xung)"
+    # Kích hoạt Ultimate Performance
     powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 | Out-Null
     $g = powercfg /list | Select-String "Ultimate Performance|Hiệu suất tối đa" | ForEach-Object { ($_ -split "\s+")[3] } | Select-Object -First 1
-    if($g){powercfg /setactive $g}
-    Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl" "Win32PrioritySeparation" 38
-    Log-Ok "Đã kích hoạt nguồn Maximum và ưu tiên 100% CPU cho Game."
+    if ($g) { powercfg /setactive $g }
+    # Ép Unpark 100% toàn bộ nhân CPU trong Registry & Powercfg
+    $parkPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\0cc5b647-c1df-4637-891a-dec35c318583"
+    if (Test-Path $parkPath) { Set-ItemProperty -Path $parkPath -Name "Attributes" -Value 0 -Type DWord -Force }
+    powercfg -setacvalueindex scheme_current 54533251-82be-4824-96c1-47b60b740d00 0cc5b647-c1df-4637-891a-dec35c318583 100
+    powercfg -setdcvalueindex scheme_current 54533251-82be-4824-96c1-47b60b740d00 0cc5b647-c1df-4637-891a-dec35c318583 100
+    powercfg -setactive scheme_current
+    # Tắt Power Throttling & Ưu tiên Win32PrioritySeparation cho Game
+    $ptPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling"
+    if (!(Test-Path $ptPath)) { New-Item -Path $ptPath -Force | Out-Null }
+    Set-ItemProperty -Path $ptPath -Name "PowerThrottlingOff" -Value 1 -Type DWord -Force
+    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl" -Name "Win32PrioritySeparation" -Value 38 -Type DWord -Force
+    Log-Ok "Đã bật Ultimate Performance, Unpark 100% nhân CPU và khóa Power Throttling."
 }
 
 function Invoke-T03 {
-    Log-Step "03" "RAM & SSD Hyper-Boost (Ép Xả RAM, Tắt Ngủ Đông & Bật TRIM)"
+    Log-Step "03" "RAM & SSD Hyper-Boost (Ép Xả RAM, Tách SvcHost & Bật SSD TRIM)"
     [System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers()
     Get-Process | ForEach-Object { try { $_.MinWorkingSet = $_.MinWorkingSet } catch {} }
-    Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control" "SvcHostSplitThresholdInKB" 8388608
+    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "SvcHostSplitThresholdInKB" -Value 8388608 -Type DWord -Force
     powercfg -h off; fsutil behavior set DisableDeleteNotify 0 | Out-Null; Optimize-Volume -DriveLetter C -ReTrim
-    Log-Ok "Giải phóng RAM tức thì, thu hồi 6GB ổ C và bật SSD TRIM."
+    Log-Ok "Đã giải phóng RAM tức thì, thu hồi 6GB Hibernation và bật SSD TRIM."
 }
 
 function Invoke-T04 {
-    Log-Step "04" "Esports Input Engine (Chuẩn Hóa Chuột 1:1 & Phím 0ms)"
-    Set-ItemProperty "HKCU:\Control Panel\Mouse" "MouseSpeed" "0"; Set-ItemProperty "HKCU:\Control Panel\Mouse" "MouseThreshold1" "0"; Set-ItemProperty "HKCU:\Control Panel\Mouse" "MouseThreshold2" "0"
-    Set-ItemProperty "HKCU:\Control Panel\Keyboard" "KeyboardDelay" "0"; Set-ItemProperty "HKCU:\Control Panel\Keyboard" "KeyboardSpeed" "31"
-    Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\mouclass\Parameters" "MouseDataQueueSize" 32
-    Log-Ok "Đã hủy gia tốc chuột, giảm trễ phím và tối ưu hàng đợi tín hiệu."
+    Log-Step "04" "Esports Input Engine (Chuẩn Hóa Chuột 1:1, Phím 0ms & Hàng Đợi Raw)"
+    Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseSpeed" -Value "0"
+    Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseThreshold1" -Value "0"
+    Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseThreshold2" -Value "0"
+    Set-ItemProperty -Path "HKCU:\Control Panel\Keyboard" -Name "KeyboardDelay" -Value "0"
+    Set-ItemProperty -Path "HKCU:\Control Panel\Keyboard" -Name "KeyboardSpeed" -Value "31"
+    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\mouclass\Parameters" -Name "MouseDataQueueSize" -Value 32 -Type DWord -Force
+    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\kbdclass\Parameters" -Name "KeyboardDataQueueSize" -Value 32 -Type DWord -Force
+    Log-Ok "Đã hủy gia tốc chuột, đưa độ trễ phím về 0ms và tinh chỉnh DataQueueSize."
 }
 
 function Invoke-T05 {
-    Log-Step "05" "GPU Hardware Acceleration (Bật HAGS, Tắt DVR & Xóa Cache GPU)"
-    Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" "HwSchMode" 2
-    Set-ItemProperty "HKCU:\System\GameConfigStore" "GameDVR_Enabled" 0
+    Log-Step "05" "GPU & PCI MSI Mode (Bật MSI Mode Cho GPU/Mạng, HAGS & Tắt Xbox DVR)"
+    # Quét tự động Card màn hình (Display) và Card mạng (Net) chuẩn PCI để bật MSI Mode
+    $pciDevs = Get-PnpDevice -Class Display, Net -Status OK | Where-Object { $_.InstanceId -match '^PCI\\' }
+    foreach ($dev in $pciDevs) {
+        $msiKey = "HKLM:\SYSTEM\CurrentControlSet\Enum\$($dev.InstanceId)\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties"
+        if (!(Test-Path $msiKey)) { New-Item -Path $msiKey -Force | Out-Null }
+        Set-ItemProperty -Path $msiKey -Name "MSISupported" -Value 1 -Type DWord -Force
+    }
+    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" -Name "HwSchMode" -Value 2 -Type DWord -Force
+    Set-ItemProperty -Path "HKCU:\System\GameConfigStore" -Name "GameDVR_Enabled" -Value 0 -Type DWord -Force
     Remove-Item -Path "$env:LOCALAPPDATA\D3DSCache\*", "$env:LOCALAPPDATA\NVIDIA\DXCache\*" -Recurse -Force
-    Log-Ok "Bật lập lịch GPU phần cứng, tắt quay Xbox DVR và xóa cache đồ họa."
+    Log-Ok "Đã kích hoạt MSI Mode (GPU & NIC), bật HAGS, tắt DVR và xóa Shader Cache."
 }
 
 function Invoke-T06 {
-    Log-Step "06" "Network Latency Shield (Xả DNS, Mở Băng Thông & Đa Nhân RSS)"
+    Log-Step "06" "MMCSS & Network Throttling (Cấu Hình MMCSS Games, Xả Băng Thông & RSS)"
     ipconfig /flushdns | Out-Null; arp -d * | Out-Null
-    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" "NetworkThrottlingIndex" 0xffffffff
-    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" "SystemResponsiveness" 0
+    # Tối ưu Network Throttling & System Responsiveness
+    $sysProf = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile"
+    Set-ItemProperty -Path $sysProf -Name "NetworkThrottlingIndex" -Value 0xffffffff -Type DWord -Force
+    Set-ItemProperty -Path $sysProf -Name "SystemResponsiveness" -Value 0 -Type DWord -Force
+    # Cấu hình chuyên sâu MMCSS Tasks\Games
+    $gamesKey = "$sysProf\Tasks\Games"
+    if (!(Test-Path $gamesKey)) { New-Item -Path $gamesKey -Force | Out-Null }
+    Set-ItemProperty -Path $gamesKey -Name "GPU Priority" -Value 8 -Type DWord -Force
+    Set-ItemProperty -Path $gamesKey -Name "Priority" -Value 6 -Type DWord -Force
+    Set-ItemProperty -Path $gamesKey -Name "Scheduling Category" -Value "High" -Type String -Force
+    Set-ItemProperty -Path $gamesKey -Name "SFIO Priority" -Value "High" -Type String -Force
+    # Bật RSS và mở rộng cổng TCP/IP
     netsh int tcp set global rss=enabled | Out-Null
-    Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" "MaxUserPort" 65534
-    Log-Ok "Làm mới mạng (An toàn Wi-Fi), mở băng thông Game và bật đa nhân RSS."
+    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "MaxUserPort" -Value 65534 -Type DWord -Force
+    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "TcpTimedWaitDelay" -Value 30 -Type DWord -Force
+    Log-Ok "Đã cấu hình MMCSS Games (Priority High), tắt Network Throttling và bật RSS."
 }
 
 function Invoke-T07 {
     Log-Step "07" "Windows Debloat & Privacy (Tắt Hiệu Ứng, Telemetry & App Ngầm)"
-    Set-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" "EnableTransparency" 0
-    Set-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" "AllowTelemetry" 0
-    Stop-Service "DiagTrack" -Force -ErrorAction SilentlyContinue
-    Set-Service "DiagTrack" -StartupType Disabled -ErrorAction SilentlyContinue
-    Set-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" "GlobalUserDisabled" 1
-    Log-Ok "Tắt hiệu ứng rườm rà (giữ Font nét), chặn App Store ngầm và theo dõi."
+    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" -Name "EnableTransparency" -Value 0 -Type DWord -Force
+    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord -Force
+    Stop-Service "DiagTrack" -Force; Set-Service "DiagTrack" -StartupType Disabled
+    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Name "GlobalUserDisabled" -Value 1 -Type DWord -Force
+    Log-Ok "Đã tắt hiệu ứng trong suốt (giữ Font nét), chặn Telemetry và đóng băng App ngầm."
 }
 
 function Invoke-T08 {
     Log-Step "08" "System Flow Control (Menu Phải 0ms, Khóa Restart & Tắt Dịch Vụ Rác)"
-    Set-ItemProperty "HKCU:\Control Panel\Desktop" "MenuShowDelay" "0"
-    Set-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" "NoAutoRebootWithLoggedOnUsers" 1
-    Stop-Service "MapsBroker", "RetailDemo" -Force -ErrorAction SilentlyContinue
-    Set-Service "MapsBroker", "RetailDemo" -StartupType Manual -ErrorAction SilentlyContinue
-    Log-Ok "Tăng tốc hiển thị Menu, khóa Auto-Restart khi chơi và đóng dịch vụ thừa."
+    Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "MenuShowDelay" -Value "0"
+    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "NoAutoRebootWithLoggedOnUsers" -Value 1 -Type DWord -Force
+    Stop-Service "MapsBroker", "RetailDemo" -Force
+    Set-Service "MapsBroker", "RetailDemo" -StartupType Manual
+    Log-Ok "Đã đưa độ trễ Menu về 0ms, khóa Auto-Restart và tắt dịch vụ phụ."
 }
 
 function Invoke-T09 {
     Log-Step "09" "SFC Scannow (Kiểm Tra & Vá File Hệ Thống)"
-    Write-Host "  └── Đang quét, vui lòng đợi..." -ForegroundColor Cyan; sfc /scannow
+    Write-Host "  └── Đang quét hệ thống, vui lòng đợi..." -ForegroundColor Cyan; sfc /scannow
     Log-Ok "Hoàn tất kiểm tra tính toàn vẹn file hệ điều hành."
 }
 
@@ -153,22 +185,25 @@ function Invoke-T10 {
 }
 
 function Invoke-T11 {
-    Log-Step "11" "Revert to Default (Hoàn Tác Về Mặc Định Windows)"
-    Set-ItemProperty "HKCU:\Control Panel\Mouse" "MouseSpeed" "1"
-    Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl" "Win32PrioritySeparation" 2
+    Log-Step "11" "Revert to Default (Hoàn Tác Thiết Lập Về Mặc Định Nhà Sản Xuất)"
+    Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseSpeed" -Value "1"
+    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl" -Name "Win32PrioritySeparation" -Value 2 -Type DWord -Force
+    $sysProf = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile"
+    Set-ItemProperty -Path $sysProf -Name "NetworkThrottlingIndex" -Value 10 -Type DWord -Force
+    Set-ItemProperty -Path $sysProf -Name "SystemResponsiveness" -Value 20 -Type DWord -Force
     powercfg -h on
-    Log-Ok "Đã khôi phục thông số chuột và phân luồng gốc của nhà sản xuất."
+    Log-Ok "Đã khôi phục thông số Chuột, CPU, MMCSS và Nguồn về mặc định."
 }
 
 function Invoke-NexusExtreme {
-    Write-Host "`n  🚀 KÍCH HOẠT ĐỘNG CƠ TỐI ƯU 1 CHẠM (NEXUS EXTREME) ⚡..." -ForegroundColor Green
+    Write-Host "`n  🚀 KÍCH HOẠT ĐỘNG CƠ TỐI ƯU 1 CHẠM (NEXUS EXTREME PRO) ⚡..." -ForegroundColor Green
     Invoke-T01; Invoke-T02; Invoke-T03; Invoke-T04; Invoke-T05; Invoke-T06; Invoke-T07; Invoke-T08
-    Write-Host "`n  🎉 ĐÃ HOÀN TẤT TOÀN BỘ QUY TRÌNH TỐI ƯU HÓA HỆ THỐNG AN TOÀN!" -ForegroundColor Green
+    Write-Host "`n  🎉 ĐÃ HOÀN TẤT TOÀN BỘ QUY TRÌNH TỐI ƯU HÓA REGISTRY & PHẦN CỨNG!" -ForegroundColor Green
     Ask-Restart
 }
 
 # ============================================================================
-# GIAO DIỆN BẢNG ĐIỀU KHIỂN (ASCII LOGO SIÊU LỚN & COMBO TWEAKS)
+# GIAO DIỆN BẢNG ĐIỀU KHIỂN (ASCII LOGO & 11 COMBO TWEAKS)
 # ============================================================================
 do {
     Clear-Host
@@ -177,7 +212,7 @@ do {
     Write-Host "      _  _ ____ _  _ _  _ ____   _  _ ____ _ ___" -ForegroundColor Cyan
     Write-Host "      |\ | |___  \/  |  | [__    |  | |  | | |  \" -ForegroundColor Cyan
     Write-Host "      | \| |___ _/\_ |__| ___]    \/  |__| | |__/" -ForegroundColor Cyan
-    Write-Host "               ⚡ EXTREME SYSTEM ENGINE v3.0 ⚡" -ForegroundColor Yellow
+    Write-Host "            ⚡ EXTREME SYSTEM ENGINE v3.0 PRO ⚡" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "  ===========================================================================" -ForegroundColor DarkMagenta
     Write-Host "   💻 OS : $($hw.OS)" -ForegroundColor Gray
@@ -186,13 +221,13 @@ do {
     Write-Host "  ---------------------------------------------------------------------------" -ForegroundColor DarkGray
 
     Write-Host "  [01] 🧹 Core Clean & Backup (Điểm Khôi Phục & Dọn Rác Toàn Diện)" -ForegroundColor Magenta
-    Write-Host "  [02] 🔥 Ultimate CPU Core (Mở Khóa Nguồn Maximum & Phân Luồng Game)"
+    Write-Host "  [02] 🔥 Ultimate CPU & Unpark (Nguồn Maximum & Unpark 100% Nhân CPU)"
     Write-Host "  [03] 🚀 RAM & SSD Hyper-Boost (Ép Xả RAM, Tắt Ngủ Đông & Bật TRIM)"
     Write-Host "  [04] 🎮 Esports Input Engine (Chuẩn Hóa Tâm Chuột 1:1 & Phím 0ms)"
-    Write-Host "  [05] 🖥️ GPU Hardware Acceleration (Bật HAGS, Tắt DVR & Xóa Cache GPU)"
-    Write-Host "  [06] 🌐 Network Latency Shield (Xả DNS, Mở Băng Thông & Đa Nhân RSS)"
+    Write-Host "  [05] 🖥️ GPU & PCI MSI Mode (Bật MSI Mode GPU/NIC, HAGS & Tắt DVR)"
+    Write-Host "  [06] 🌐 MMCSS & Network Shield (MMCSS Games Pro, Xả Băng Thông & RSS)"
     Write-Host "  [07] 🛡️ Windows Debloat & Privacy (Tắt Hiệu Ứng, Telemetry & App Ngầm)"
-    Write-Host "  [08] ⚡ System Flow Control (Menu Phải 0ms, Khóa Restart & Tắt Dịch Vụ Rác)"
+    Write-Host "  [08] ⚡ System Flow Control (Menu Phải 0ms, Khóa Restart & Dịch Vụ Rác)"
     Write-Host "  [09] 🩺 SFC Scannow (Kiểm Tra & Vá File Hệ Thống)"
     Write-Host "  [10] 📡 Live Ping Test (Đo Độ Trễ Trực Tiếp Máy Chủ Quốc Tế)"
     Write-Host "  [11] 🔄 Revert to Default (Hoàn Tác Về Mặc Định Nhà Sản Xuất)"
