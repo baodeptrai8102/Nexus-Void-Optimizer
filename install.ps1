@@ -8,7 +8,9 @@ $NexusRawUrl = "https://raw.githubusercontent.com/baodeptrai8102/Nexus-Void-Opti
 # Tự động nâng quyền Administrator
 if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     if ($PSCommandPath) {
-        Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs } else { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -Command `"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; irm '$NexusRawUrl' | iex`"" -Verb RunAs
+        Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+    } else {
+        Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -Command `"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; irm '$NexusRawUrl' | iex`"" -Verb RunAs
     }
     exit
 }
@@ -28,12 +30,15 @@ function Log-Ok($msg) {
 
 function Wait-Key {
     Write-Host "`n  Nhấn phím bất kỳ để quay lại trung tâm chỉ huy 🌌 NEXUS VOID ⚡..." -ForegroundColor DarkGray
-    $null =$Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
 function Get-HardwareInfo {
     $cpu = (Get-CimInstance Win32_Processor | Select-Object -First 1).Name -replace '\s+', ' '
-    $os  = (Get-CimInstance Win32_OperatingSystem)$totalRam = [math]::Round($os.TotalVisibleMemorySize / 1MB, 1)$freeRam  = [math]::Round($os.FreePhysicalMemory / 1MB, 1)$usedRam  = [math]::Round($totalRam -$freeRam, 1)
+    $os  = (Get-CimInstance Win32_OperatingSystem)
+    $totalRam = [math]::Round($os.TotalVisibleMemorySize / 1MB, 1)
+    $freeRam  = [math]::Round($os.FreePhysicalMemory / 1MB, 1)
+    $usedRam  = [math]::Round($totalRam - $freeRam, 1)
     return @{ CPU = $cpu; OS = $os.Caption; RAM = "$usedRam GB / $totalRam GB (Trống: $freeRam GB)" }
 }
 
@@ -45,9 +50,9 @@ function Invoke-M04 { Log-Step "04" "Xóa Cache Shader DirectX & GPU..."; Remove
 function Invoke-M05 { Log-Step "05" "Dọn Cache trình duyệt (Giữ Login)..."; Remove-Item -Path "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Cache\Cache_Data\*" -Recurse -Force; Log-Ok "Đã dọn cache." }
 
 # --- MODULE 2: CPU, RAM & SSD ---
-function Invoke-M06 { Log-Step "06" "Mở khóa Ultimate Performance..."; powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 | Out-Null; $g = powercfg /list | Select-String "Ultimate Performance|Hiệu suất tối đa" | ForEach-Object { ($_ -split "\s+")[3] } | Select-Object -First 1; if($g){powercfg /setactive$g}; Log-Ok "Kích hoạt hiệu năng tối đa." }
+function Invoke-M06 { Log-Step "06" "Mở khóa Ultimate Performance..."; powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 | Out-Null; $g = powercfg /list | Select-String "Ultimate Performance|Hiệu suất tối đa" | ForEach-Object { ($_ -split "\s+")[3] } | Select-Object -First 1; if($g){powercfg /setactive $g}; Log-Ok "Kích hoạt hiệu năng tối đa." }
 function Invoke-M07 { Log-Step "07" "Ưu tiên luồng CPU/GPU cho Game..."; Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl" "Win32PrioritySeparation" 38; Log-Ok "Đã ưu tiên tài nguyên cho Game." }
-function Invoke-M08 { Log-Step "08" "Ép thu hồi RAM rảnh rỗi..."; [System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers(); Get-Process | ForEach-Object { try { $_.MinWorkingSet =$_.MinWorkingSet } catch {} }; Log-Ok "Đã giải phóng RAM tức thì." }
+function Invoke-M08 { Log-Step "08" "Ép thu hồi RAM rảnh rỗi..."; [System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers(); Get-Process | ForEach-Object { try { $_.MinWorkingSet = $_.MinWorkingSet } catch {} }; Log-Ok "Đã giải phóng RAM tức thì." }
 function Invoke-M09 { Log-Step "09" "Tối ưu tiến trình SvcHost..."; Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control" "SvcHostSplitThresholdInKB" 8388608; Log-Ok "Đã đồng bộ ngưỡng SvcHost." }
 function Invoke-M10 { Log-Step "10" "Tắt Ngủ Đông & Bật SSD TRIM..."; powercfg -h off; fsutil behavior set DisableDeleteNotify 0 | Out-Null; Optimize-Volume -DriveLetter C -ReTrim; Log-Ok "Đã thu hồi 6GB và tối ưu SSD." }
 
@@ -119,18 +124,52 @@ do {
     $sel = Read-Host "`n  👉 Chọn Lệnh (1-30, A, 0)"
     
     switch ($sel.Trim().ToUpper()) {
-        "1" {"01"} { Invoke-M01; Wait-Key } "2" {"02"} { Invoke-M02; Wait-Key } "3" {"03"} { Invoke-M03; Wait-Key } "4" {"04"} { Invoke-M04; Wait-Key } "5" {"05"} { Invoke-M05; Wait-Key }
-        "6" {"06"} { Invoke-M06; Wait-Key } "7" {"07"} { Invoke-M07; Wait-Key } "8" {"08"} { Invoke-M08; Wait-Key } "9" {"09"} { Invoke-M09; Wait-Key } "10" { Invoke-M10; Wait-Key }
-        "11" { Invoke-M11; Wait-Key } "12" { Invoke-M12; Wait-Key } "13" { Invoke-M13; Wait-Key } "14" { Invoke-M14; Wait-Key } "15" { Invoke-M15; Wait-Key }
-        "16" { Invoke-M16; Wait-Key } "17" { Invoke-M17; Wait-Key } "18" { Invoke-M18; Wait-Key } "19" { Invoke-M19; Wait-Key } "20" { Invoke-M20; Wait-Key }
-        "21" { Invoke-M21; Wait-Key } "22" { Invoke-M22; Wait-Key } "23" { Invoke-M23; Wait-Key } "24" { Invoke-M24; Wait-Key } "25" { Invoke-M25; Wait-Key }
-        "26" { Invoke-M26; Wait-Key } "27" { Invoke-M27; Wait-Key } "28" { Invoke-M28; Wait-Key } "29" { Invoke-M29; Wait-Key } "30" { Invoke-M30; Wait-Key }
+        "1"  { Invoke-M01; Wait-Key }
+        "01" { Invoke-M01; Wait-Key }
+        "2"  { Invoke-M02; Wait-Key }
+        "02" { Invoke-M02; Wait-Key }
+        "3"  { Invoke-M03; Wait-Key }
+        "03" { Invoke-M03; Wait-Key }
+        "4"  { Invoke-M04; Wait-Key }
+        "04" { Invoke-M04; Wait-Key }
+        "5"  { Invoke-M05; Wait-Key }
+        "05" { Invoke-M05; Wait-Key }
+        "6"  { Invoke-M06; Wait-Key }
+        "06" { Invoke-M06; Wait-Key }
+        "7"  { Invoke-M07; Wait-Key }
+        "07" { Invoke-M07; Wait-Key }
+        "8"  { Invoke-M08; Wait-Key }
+        "08" { Invoke-M08; Wait-Key }
+        "9"  { Invoke-M09; Wait-Key }
+        "09" { Invoke-M09; Wait-Key }
+        "10" { Invoke-M10; Wait-Key }
+        "11" { Invoke-M11; Wait-Key }
+        "12" { Invoke-M12; Wait-Key }
+        "13" { Invoke-M13; Wait-Key }
+        "14" { Invoke-M14; Wait-Key }
+        "15" { Invoke-M15; Wait-Key }
+        "16" { Invoke-M16; Wait-Key }
+        "17" { Invoke-M17; Wait-Key }
+        "18" { Invoke-M18; Wait-Key }
+        "19" { Invoke-M19; Wait-Key }
+        "20" { Invoke-M20; Wait-Key }
+        "21" { Invoke-M21; Wait-Key }
+        "22" { Invoke-M22; Wait-Key }
+        "23" { Invoke-M23; Wait-Key }
+        "24" { Invoke-M24; Wait-Key }
+        "25" { Invoke-M25; Wait-Key }
+        "26" { Invoke-M26; Wait-Key }
+        "27" { Invoke-M27; Wait-Key }
+        "28" { Invoke-M28; Wait-Key }
+        "29" { Invoke-M29; Wait-Key }
+        "30" { Invoke-M30; Wait-Key }
         "A"  {
             Write-Host "`n  🌌 ĐANG CHẠY TỰ ĐỘNG TOÀN BỘ 28 TÁC VỤ NEXUS VOID ⚡..." -ForegroundColor Cyan
             Invoke-M01; Invoke-M02; Invoke-M03; Invoke-M04; Invoke-M05; Invoke-M06; Invoke-M07; Invoke-M08; Invoke-M09; Invoke-M10
             Invoke-M11; Invoke-M12; Invoke-M13; Invoke-M14; Invoke-M15; Invoke-M16; Invoke-M17; Invoke-M18; Invoke-M19; Invoke-M20
             Invoke-M21; Invoke-M22; Invoke-M23; Invoke-M24; Invoke-M25; Invoke-M26; Invoke-M27; Invoke-M28
-            Write-Host "`n  🎉 ĐÃ HOÀN TẤT TOÀN BỘ QUY TRÌNH TỐI ƯU HÓA HỆ THỐNG AN TOÀN!" -ForegroundColor Green; Wait-Key
+            Write-Host "`n  🎉 ĐÃ HOÀN TẤT TOÀN BỘ QUY TRÌNH TỐI ƯU HÓA HỆ THỐNG AN TOÀN!" -ForegroundColor Green
+            Wait-Key
         }
         "0"  { exit }
         default { Write-Host "  ⚠️ Lỗi mã! Hãy nhập từ 1-30, A hoặc 0." -ForegroundColor Red; Start-Sleep -Seconds 1 }
