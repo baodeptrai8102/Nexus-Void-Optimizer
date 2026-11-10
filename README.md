@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌌 NEXUS VOID ⚡ 
+# 🌌 NEXUS VOID OPTIMIZER ⚡
 ### EXTREME SYSTEM ENGINE v3.0
 
 *The ultimate one-click system optimization engine for Gaming & Windows performance.*
@@ -15,15 +15,17 @@
 
 ---
 
-## 🌟 GIỚI THIỆU TỔNG QUAN
+## 🌟 GIỚI THIỆU & MÔ TẢ TÍNH NĂNG (IRM SCRIPT)
 
-**NEXUS VOID OPTIMIZER** là một công cụ tối ưu hóa hệ thống Windows mạnh mẽ được thiết kế dành riêng cho game thủ và những người dùng muốn khai thác tối đa hiệu năng phần cứng. Thay vì phải can thiệp thủ công vào hàng loạt thiết lập phức tạp, Nexus Void gom nhóm toàn bộ các tinh chỉnh chuyên sâu thành một **bảng điều khiển tương tác trực quan**, giúp máy tính mượt mà hơn, giảm độ trễ và loại bỏ hoàn toàn các tiến trình rác ngầm.
+**NEXUS VOID OPTIMIZER** là công cụ tối ưu hóa hệ thống chạy trực tiếp qua câu lệnh PowerShell (`irm | iex`), giúp bạn tinh chỉnh và tăng tốc độ phản hồi của máy tính chỉ bằng một cú click chuột mà không cần tải file thủ công.
+
+Mã nguồn được thiết kế theo tiêu chí **An toàn tuyệt đối - Gọn nhẹ - Hiệu năng cao**, tích hợp sẵn giao diện bảng điều khiển trực quan với 11 Module chuyên sâu.
 
 ---
 
-## ⚡ KHỞI CHẠY NHANH 1 CHẠM (ONE-LINE EXECUTION)
+## ⚡ HƯỚNG DẪN KHỞI CHẠY NHANH (ONE-LINE EXECUTION)
 
-Bạn không cần phải tải xuống bất kỳ tệp tin nào. Chỉ cần mở **PowerShell** với quyền **Administrator (Run as Admin)**, copy câu lệnh dưới đây dán vào và nhấn **Enter**:
+Mở **PowerShell** với quyền **Administrator (Run as Admin)**, copy câu lệnh dưới đây dán vào và nhấn **Enter**:
 
 ```powershell
 irm "[https://raw.githubusercontent.com/baodeptrai8102/Nexus-Void-Optimizer/main/install.ps1](https://raw.githubusercontent.com/baodeptrai8102/Nexus-Void-Optimizer/main/install.ps1)" | iex
