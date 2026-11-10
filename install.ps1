@@ -202,15 +202,24 @@ do {
     $sel = Read-Host "`n  👉 Chọn Lệnh (1-11, A, 0)"
     
     switch ($sel.Trim().ToUpper()) {
-        "1" {"01"} { Invoke-T01; Ask-Restart; Wait-Key }
-        "2" {"02"} { Invoke-T02; Ask-Restart; Wait-Key }
-        "3" {"03"} { Invoke-T03; Ask-Restart; Wait-Key }
-        "4" {"04"} { Invoke-T04; Ask-Restart; Wait-Key }
-        "5" {"05"} { Invoke-T05; Ask-Restart; Wait-Key }
-        "6" {"06"} { Invoke-T06; Ask-Restart; Wait-Key }
-        "7" {"07"} { Invoke-T07; Ask-Restart; Wait-Key }
-        "8" {"08"} { Invoke-T08; Ask-Restart; Wait-Key }
-        "9" {"09"} { Invoke-T09; Wait-Key }
+        "1"  { Invoke-T01; Ask-Restart; Wait-Key }
+        "01" { Invoke-T01; Ask-Restart; Wait-Key }
+        "2"  { Invoke-T02; Ask-Restart; Wait-Key }
+        "02" { Invoke-T02; Ask-Restart; Wait-Key }
+        "3"  { Invoke-T03; Ask-Restart; Wait-Key }
+        "03" { Invoke-T03; Ask-Restart; Wait-Key }
+        "4"  { Invoke-T04; Ask-Restart; Wait-Key }
+        "04" { Invoke-T04; Ask-Restart; Wait-Key }
+        "5"  { Invoke-T05; Ask-Restart; Wait-Key }
+        "05" { Invoke-T05; Ask-Restart; Wait-Key }
+        "6"  { Invoke-T06; Ask-Restart; Wait-Key }
+        "06" { Invoke-T06; Ask-Restart; Wait-Key }
+        "7"  { Invoke-T07; Ask-Restart; Wait-Key }
+        "07" { Invoke-T07; Ask-Restart; Wait-Key }
+        "8"  { Invoke-T08; Ask-Restart; Wait-Key }
+        "08" { Invoke-T08; Ask-Restart; Wait-Key }
+        "9"  { Invoke-T09; Wait-Key }
+        "09" { Invoke-T09; Wait-Key }
         "10" { Invoke-T10; Wait-Key }
         "11" { Invoke-T11; Ask-Restart; Wait-Key }
         "A"  { Invoke-NexusExtreme; Wait-Key }
