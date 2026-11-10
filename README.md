@@ -19,7 +19,7 @@
 Mở **PowerShell** (Run as Admin), copy lệnh dưới đây dán vào và nhấn **Enter**:
 
 ```powershell
-irm "[https://raw.githubusercontent.com/baodeptrai8102/Nexus-Void-Optimizer/main/install.ps1](https://raw.githubusercontent.com/baodeptrai8102/Nexus-Void-Optimizer/main/install.ps1)" | iex
+irm "https://raw.githubusercontent.com/baodeptrai8102/Nexus-Void-Optimizer/main/install.ps1" | iex
 ```
 
 ---
