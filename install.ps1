@@ -201,29 +201,19 @@ do {
     
     $sel = Read-Host "`n  👉 Chọn Lệnh (1-11, A, 0)"
     
-    switch ($sel.Trim().ToUpper()) {
-        "1"  { Invoke-T01; Ask-Restart; Wait-Key }
-        "01" { Invoke-T01; Ask-Restart; Wait-Key }
-        "2"  { Invoke-T02; Ask-Restart; Wait-Key }
-        "02" { Invoke-T02; Ask-Restart; Wait-Key }
-        "3"  { Invoke-T03; Ask-Restart; Wait-Key }
-        "03" { Invoke-T03; Ask-Restart; Wait-Key }
-        "4"  { Invoke-T04; Ask-Restart; Wait-Key }
-        "04" { Invoke-T04; Ask-Restart; Wait-Key }
-        "5"  { Invoke-T05; Ask-Restart; Wait-Key }
-        "05" { Invoke-T05; Ask-Restart; Wait-Key }
-        "6"  { Invoke-T06; Ask-Restart; Wait-Key }
-        "06" { Invoke-T06; Ask-Restart; Wait-Key }
-        "7"  { Invoke-T07; Ask-Restart; Wait-Key }
-        "07" { Invoke-T07; Ask-Restart; Wait-Key }
-        "8"  { Invoke-T08; Ask-Restart; Wait-Key }
-        "08" { Invoke-T08; Ask-Restart; Wait-Key }
-        "9"  { Invoke-T09; Wait-Key }
-        "09" { Invoke-T09; Wait-Key }
-        "10" { Invoke-T10; Wait-Key }
-        "11" { Invoke-T11; Ask-Restart; Wait-Key }
-        "A"  { Invoke-NexusExtreme; Wait-Key }
-        "0"  { exit }
-        default { Write-Host "  ⚠️ Lỗi mã! Hãy nhập từ 1-11, A hoặc 0." -ForegroundColor Red; Start-Sleep -Seconds 1 }
-    }
+    if ($sel -eq '1' -or $sel -eq '01') { Invoke-T01; Ask-Restart; Wait-Key }
+    elseif ($sel -eq '2' -or $sel -eq '02') { Invoke-T02; Ask-Restart; Wait-Key }
+    elseif ($sel -eq '3' -or $sel -eq '03') { Invoke-T03; Ask-Restart; Wait-Key }
+    elseif ($sel -eq '4' -or $sel -eq '04') { Invoke-T04; Ask-Restart; Wait-Key }
+    elseif ($sel -eq '5' -or $sel -eq '05') { Invoke-T05; Ask-Restart; Wait-Key }
+    elseif ($sel -eq '6' -or $sel -eq '06') { Invoke-T06; Ask-Restart; Wait-Key }
+    elseif ($sel -eq '7' -or $sel -eq '07') { Invoke-T07; Ask-Restart; Wait-Key }
+    elseif ($sel -eq '8' -or $sel -eq '08') { Invoke-T08; Ask-Restart; Wait-Key }
+    elseif ($sel -eq '9' -or $sel -eq '09') { Invoke-T09; Wait-Key }
+    elseif ($sel -eq '10') { Invoke-T10; Wait-Key }
+    elseif ($sel -eq '11') { Invoke-T11; Ask-Restart; Wait-Key }
+    elseif ($sel -eq 'a' -or $sel -eq 'A') { Invoke-NexusExtreme; Wait-Key }
+    elseif ($sel -eq '0') { exit }
+    else { Write-Host "  ⚠️ Lỗi mã! Hãy nhập từ 1-11, A hoặc 0." -ForegroundColor Red; Start-Sleep -Seconds 1 }
+
 } while ($true)
